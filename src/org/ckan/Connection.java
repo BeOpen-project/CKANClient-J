@@ -229,6 +229,6 @@ public final class Connection {
 	
 	public static String getProperty(String propName) {
 		Optional<String> prop = Optional.ofNullable(System.getenv(propName.toString()));
-		return prop.orElse(proxyProps.getProperty(propName.toString()));
+		return prop.orElseGet(() -> proxyProps.getProperty(propName.toString(), ""));
 	}
 }
