@@ -10,12 +10,10 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 
@@ -23,25 +21,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.AbstractHttpClient;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.apache.logging.log4j.*;
 
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.client.CredentialsProvider;
 
 /**
  * Connection holds the connection details for this session
@@ -82,7 +72,7 @@ public final class Connection {
 		this.m_port = port;
 
 		try {
-			URL u = new URL(this.m_host + ":" + this.m_port + "/api");
+			new URL(this.m_host + ":" + this.m_port + "/api");
 		} catch (MalformedURLException mue) {
 			mue.printStackTrace();
 			logger.info(mue);
@@ -133,17 +123,13 @@ public final class Connection {
 		 * HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).
 		 * build();
 		 */
-		final HttpParams httpParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParams, 300000);
-		// if(!(data.contains("\"rows\":\"1\"") ||
-		// data.contains("\"rows\":\"0\"") || path.contains("package_list")) )
-		// HttpConnectionParams.setSoTimeout(httpParams, 6);
-		// else
+		RequestConfig requestConfig = RequestConfig.custom()
+			.setConnectTimeout(300000)
+			.setSocketTimeout(900000)
+			.build();
 		
-		HttpConnectionParams.setSoTimeout(httpParams, 900000);
-		
-		SSLContextBuilder builder = new SSLContextBuilder();
-	    builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+		SSLContextBuilder builder = SSLContextBuilder.create();
+		builder.loadTrustMaterial(new org.apache.http.conn.ssl.TrustSelfSignedStrategy());
 	    SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
 	            builder.build());
 	    
@@ -173,10 +159,20 @@ public final class Connection {
 			        		            sslsf).build();
 						
 			if (StringUtils.isNotBlank(getProperty("https.proxyUser"))) {
-				((AbstractHttpClient) httpclient).getCredentialsProvider().setCredentials(
+				CredentialsProvider credsProvider = new BasicCredentialsProvider();
+				credsProvider.setCredentials(
 						new AuthScope(getProperty("https.proxyHost"), port),
-						(Credentials) new UsernamePasswordCredentials(getProperty("https.proxyUser"),
-								getProperty("https.proxyPassword")));
+						new UsernamePasswordCredentials(getProperty("https.proxyUser"), getProperty("https.proxyPassword")));
+				httpclient = HttpClients.custom()
+						.setRoutePlanner(routePlanner)
+						.setSSLSocketFactory(sslsf)
+						.setDefaultCredentialsProvider(credsProvider)
+						.build();
+			httpclient = HttpClients.custom()
+					.setRoutePlanner(routePlanner)
+					.setSSLSocketFactory(sslsf)
+					.setDefaultCredentialsProvider(credsProvider)
+					.build();
 			}
 		}else {
 			httpclient = HttpClients.custom().setSSLSocketFactory(
@@ -192,7 +188,7 @@ public final class Connection {
 			postRequest.setHeader("X-CKAN-API-Key", this._apikey);
 
 			StringEntity input = new StringEntity(data, "UTF-8");
-
+			postRequest.setConfig(requestConfig);
 			input.setContentType("application/json");
 			input.setContentEncoding("UTF-8");
 			postRequest.setEntity(input);
