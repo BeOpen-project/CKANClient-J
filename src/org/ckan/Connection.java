@@ -61,6 +61,10 @@ public final class Connection {
 	}
 
 	public Connection(String host) {
+		if(host.contains("http")) {
+			// remove http:// and add https://
+			this.m_host = "https" + host.split("http")[1];
+		}
 		this.m_host = host;
 	}
 
