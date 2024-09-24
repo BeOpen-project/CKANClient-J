@@ -156,7 +156,7 @@ public final class Connection {
 		HttpHost proxy = null;
 		CloseableHttpClient httpclient=null;
 		if (Boolean.parseBoolean(getProperty("https.proxyEnabled").trim())
-				&& StringUtils.isNotBlank(getProperty("http.proxyHost").trim())) {
+				&& StringUtils.isNotBlank(getProperty("https.proxyHost").trim())) {
 			
 			int port = 80;
 			if (StringUtils.isNotBlank(getProperty("https.proxyPort"))) {
@@ -172,9 +172,9 @@ public final class Connection {
 						
 			if (StringUtils.isNotBlank(getProperty("https.proxyUser"))) {
 				((AbstractHttpClient) httpclient).getCredentialsProvider().setCredentials(
-						new AuthScope(getProperty("http.proxyHost"), port),
-						(Credentials) new UsernamePasswordCredentials(getProperty("http.proxyUser"),
-								getProperty("http.proxyPassword")));
+						new AuthScope(getProperty("https.proxyHost"), port),
+						(Credentials) new UsernamePasswordCredentials(getProperty("https.proxyUser"),
+								getProperty("https.proxyPassword")));
 			}
 		}else {
 			httpclient = HttpClients.custom().setSSLSocketFactory(
