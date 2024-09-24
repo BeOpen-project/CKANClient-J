@@ -155,23 +155,30 @@ public final class Connection {
 		 */
 		HttpHost proxy = null;
 		CloseableHttpClient httpclient=null;
-		if (Boolean.parseBoolean(getProperty("http.proxyEnabled").trim()) && StringUtils.isNotBlank(getProperty("http.proxyHost").trim())) {
-		    int port = 80;
-		    if (StringUtils.isNotBlank(getProperty("http.proxyPort"))) {
-		        port = Integer.parseInt(getProperty("http.proxyPort"));
-		    }
-		
-		    String protocol = this.m_host.startsWith("https") ? "https" : "http";
-		    proxy = new HttpHost(getProperty("http.proxyHost"), port, protocol);
-		    DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-		    httpclient = HttpClients.custom().setRoutePlanner(routePlanner).setSSLSocketFactory(sslsf).build();
-		
-		    if (StringUtils.isNotBlank(getProperty("http.proxyUser"))) {
-		        ((AbstractHttpClient)httpclient).getCredentialsProvider().setCredentials(new AuthScope(getProperty("http.proxyHost"), port),
-		                new UsernamePasswordCredentials(getProperty("http.proxyUser"), getProperty("http.proxyPassword")));
-		    }
-		} else {
-		    httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+		if (Boolean.parseBoolean(getProperty("https.proxyEnabled").trim())
+				&& StringUtils.isNotBlank(getProperty("http.proxyHost").trim())) {
+			
+			int port = 80;
+			if (StringUtils.isNotBlank(getProperty("https.proxyPort"))) {
+				port = Integer.parseInt(getProperty("https.proxyPort"));
+			}
+			proxy = new HttpHost(getProperty("https.proxyHost"), port, "https");
+			
+			DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+			httpclient = HttpClients.custom()
+			                    .setRoutePlanner(routePlanner)
+			                    .setSSLSocketFactory(
+			        		            sslsf).build();
+						
+			if (StringUtils.isNotBlank(getProperty("https.proxyUser"))) {
+				((AbstractHttpClient) httpclient).getCredentialsProvider().setCredentials(
+						new AuthScope(getProperty("http.proxyHost"), port),
+						(Credentials) new UsernamePasswordCredentials(getProperty("http.proxyUser"),
+								getProperty("http.proxyPassword")));
+			}
+		}else {
+			httpclient = HttpClients.custom().setSSLSocketFactory(
+		            sslsf).build();
 		}
 		
 		
