@@ -64,15 +64,27 @@ public final class Connection {
 		if(host.contains("http")) {
 			// remove http:// and add https://
 			this.m_host = "https" + host.split("http")[1];
+		}else {
+			this.m_host = host;
 		}
-		this.m_host = host;
 	}
 
 	public Connection(String host, int port) {
 		if (!Pattern.matches(".*:(\\d.*)", host))
-			this.m_host = host;
+			if(host.contains("http")) {
+				// remove http:// and add https://
+				this.m_host = "https" + host.split("http")[1];
+			}else {
+				this.m_host = host;
+			}
 		else
 			this.m_host = host.split(".*:(\\d.*)")[0];
+			if(host.contains("http")) {
+				// remove http:// and add https://
+				this.m_host = "https" + host.split("http")[1];
+			}else {
+				this.m_host = host;
+			}
 		this.m_port = port;
 
 		try {
