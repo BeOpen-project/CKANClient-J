@@ -61,7 +61,7 @@ public final class Connection {
 	}
 
 	public Connection(String host) {
-		if(host.contains("http")) {
+		if(host.contains("http") && !host.contains("https")) {
 			// remove http:// and add https://
 			this.m_host = "https" + host.split("http")[1];
 		}else {
@@ -71,7 +71,7 @@ public final class Connection {
 
 	public Connection(String host, int port) {
 		if (!Pattern.matches(".*:(\\d.*)", host))
-			if(host.contains("http")) {
+			if(host.contains("http") && !host.contains("https")) {
 				// remove http:// and add https://
 				this.m_host = "https" + host.split("http")[1];
 			}else {
@@ -79,7 +79,7 @@ public final class Connection {
 			}
 		else
 			this.m_host = host.split(".*:(\\d.*)")[0];
-			if(host.contains("http")) {
+			if(host.contains("http") && !host.contains("https")) {
 				// remove http:// and add https://
 				this.m_host = "https" + host.split("http")[1];
 			}else {
