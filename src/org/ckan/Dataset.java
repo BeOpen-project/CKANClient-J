@@ -94,7 +94,7 @@ public class Dataset {
     private List<String> conforms_to;
     private String frequency;
     private List<String> has_version;
-    private List<String> hvd_category;// String
+    private String hvd_category;// List<String>
     private List<String> was_generated_by;
     private String identifier;
     private List<String> is_referenced_by;
@@ -443,11 +443,11 @@ public class Dataset {
         this.has_version = has_version;
     }
 
-    public List<String> getHvd_category() {
+    public String getHvd_category() {
         return hvd_category;
     }
 
-    public void setHvd_category(List<String> hvd_category) {
+    public void setHvd_category(String hvd_category) {
         this.hvd_category = hvd_category;
     }
 

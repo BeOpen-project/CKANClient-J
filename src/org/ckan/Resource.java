@@ -56,6 +56,7 @@ public class Resource {
     private String status;
     private String temporal_resolution;
     private String uri;
+    private String has_policy;
 
     // DCAT-AP v3.0.0 services
     private List<AccessService> access_services;
@@ -415,6 +416,14 @@ public class Resource {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getHas_policy() {
+        return has_policy;
+    }
+
+    public void setHas_policy(String has_policy) {
+        this.has_policy = has_policy;
     }
 
     public List<AccessService> getAccess_services() {
