@@ -111,6 +111,26 @@ public class Dataset {
     private List<String> theme;
     // DCAT-AP v3.0.0 relationship
     private List<QualifiedRelation> qualified_relation;
+    private List<SpatialCoverage> spatial_coverage;
+    private List<TemporalCoverage> temporal_coverage;
+
+    
+
+    public List<SpatialCoverage> getSpatial_coverage() {
+        return spatial_coverage;
+    }
+
+    public void setSpatial_coverage(List<SpatialCoverage> spatial_coverage) {
+        this.spatial_coverage = spatial_coverage;
+    }
+
+    public List<TemporalCoverage> getTemporal_coverage() {
+        return temporal_coverage;
+    }
+
+    public void setTemporal_coverage(List<TemporalCoverage> temporal_coverage) {
+        this.temporal_coverage = temporal_coverage;
+    }
 
     public void setId(String id) {
         this.id = id;
